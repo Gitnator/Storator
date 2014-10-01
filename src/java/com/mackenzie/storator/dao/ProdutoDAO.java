@@ -21,16 +21,17 @@ import java.util.logging.Logger;
  *
  * @author Rafael
  */
-public class ProdutoDAO implements GenericDAO<Produto>{
+public class ProdutoDAO {
 
-    @Override
-    public void inserir(Produto produto) throws PersistenciaException {
+
+    public void atualizar(Integer codigo, Integer quantidade) throws PersistenciaException {
         
         Connection connection = Conexao.getInstance().getConnection();
-        String sql = "INSERT INTO VALUES ()";
+        String sql = "UPDATE Produto SET estoque=estoque-? WHERE cod_prod=?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, produto.getNome());
+            ps.setInt(1, quantidade);
+            ps.setInt(2, codigo);
             ps.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,27 +47,46 @@ public class ProdutoDAO implements GenericDAO<Produto>{
         }
     }
 
-    @Override
-    public void atualizar(Produto e) throws PersistenciaException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void excluir(Integer id) throws PersistenciaException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<Produto> listar() throws PersistenciaException {
-        
-        ArrayList<Produto> list = new ArrayList<Produto>();
+    
+    public Produto buscarPorId(Integer id) throws PersistenciaException {
+        Produto produto = null;
         Connection connection = Conexao.getInstance().getConnection();
-        String sql = "SELECT FROM ";
+        String sql = "SELECT * FROM Produto WHERE cod_prod="+id;
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Produto produto = null; // = new Produto() ;   ARRUMAR QUANDO DB ESTIVER PRONTO
+                produto = new Produto((Integer)rs.getObject(1), (String)rs.getObject(2), (String) rs.getObject(3), (Double)rs.getObject(4), (Integer)rs.getObject(5), (Integer)rs.getObject(6), (String)rs.getObject(7));
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new PersistenciaException("Não foi possível salvar os dados no bd");
+        } finally {
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return produto;
+    }
+    
+    public List<Produto> buscarPorNome(String e) throws PersistenciaException {
+        
+        e = "'%"+e+"%'";
+        
+        ArrayList<Produto> list = new ArrayList<Produto>();
+        Connection connection = Conexao.getInstance().getConnection();
+        String sql = "SELECT * FROM Produto WHERE (nome_prod LIKE ?)";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, e);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Produto produto = new Produto((Integer)rs.getObject(1), (String)rs.getObject(2), (String) rs.getObject(3), (Double)rs.getObject(4), (Integer)rs.getObject(5), (Integer)rs.getObject(6), (String)rs.getObject(7));
                 list.add(produto);
             }
 
@@ -85,17 +105,17 @@ public class ProdutoDAO implements GenericDAO<Produto>{
         return list;    
     }
 
-    @Override
-    public Produto buscarPorId(Integer id) throws PersistenciaException {
+    public List<Produto> buscarPorCategoria(Integer id) throws PersistenciaException {
         
-        Produto produto = null;
+        ArrayList<Produto> list = new ArrayList<Produto>();
         Connection connection = Conexao.getInstance().getConnection();
-        String sql = "SELECT FROM WHERE "+id;
+        String sql = "SELECT * FROM Produto WHERE (id_cat="+id+")";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                //produto = new Produto();     ARRUMAR QUANDO DB ESTIVER PRONTO
+                Produto produto = new Produto((Integer)rs.getObject(1), (String)rs.getObject(2), (String) rs.getObject(3), (Double)rs.getObject(4), (Integer)rs.getObject(5), (Integer)rs.getObject(6), (String)rs.getObject(7));
+                list.add(produto);
             }
 
         } catch (SQLException ex) {
@@ -110,7 +130,7 @@ public class ProdutoDAO implements GenericDAO<Produto>{
                 Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return produto;
+        return list;
     }
     
 }

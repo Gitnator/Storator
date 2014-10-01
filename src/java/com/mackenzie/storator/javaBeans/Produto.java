@@ -9,17 +9,38 @@ import java.io.Serializable;
 public class Produto implements Serializable{
     
     private String nome;
-    private String cod;
+    private int cod;
     private double preco;
     private String img;
     private String descricao;
+    private int estoque;
+    private int categoria;
 
-    public Produto(String nome, String cod, double preco, String tipo, String descricao) {
+
+    public Produto(int cod, String nome, String descricao, double preco, int categoria,int estoque, String img) {
         this.nome = nome;
         this.cod = cod;
         this.preco = preco;
-        this.img = tipo;
+        this.img = img;
         this.descricao = descricao;
+        this.categoria = categoria;
+        this.estoque = estoque;
+    }
+    
+    public int getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(int estoque) {
+        this.estoque = estoque;
+    }
+
+    public int getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(int categoria) {
+        this.categoria = categoria;
     }
 
     public String getNome() {
@@ -30,11 +51,11 @@ public class Produto implements Serializable{
         this.nome = nome;
     }
 
-    public String getCod() {
+    public int getCod() {
         return cod;
     }
 
-    public void setCod(String cod) {
+    public void setCod(int cod) {
         this.cod = cod;
     }
 
